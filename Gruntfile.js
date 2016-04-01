@@ -9,8 +9,8 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'build/subsonic-api.js',
-        dest: 'build/subsonic-api.min.js'
+        src: 'es5/subsonic-api.js',
+        dest: 'es5/subsonic-api.min.js'
       }
     },
     "babel": {
@@ -25,7 +25,7 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
-          "build/subsonic-api.js": "src/subsonic-api.js"
+          "es5/subsonic-api.js": "es6/subsonic-api.js"
         }
       }
     }

@@ -203,6 +203,7 @@ window.SubsonicAPI = (() => {
     constructor (obj) {
       if (typeof obj !== 'object') {
         throw new Error('Input must be an object & contain url, user, password & appName fields');
+        return;
       }
       if (obj.hasOwnProperty('ip')
           && obj.hasOwnProperty('port')
@@ -229,11 +230,11 @@ window.SubsonicAPI = (() => {
             }
           })();
           this._password = obj.password;
-          this._fishVersion(this._url).then((version) => {
+          this._fishVersion(this._url).then(version => {
             this.params.v = version;
-            this.ping().then((res) => {
+            this.ping().then(res => {
               if (res.status === 'ok') {
-                this.getUserInfo().then((userInfo) => {
+                this.getUserInfo().then(userInfo => {
                   let responseEvent = new CustomEvent('subsonicApi-ready', {
                     detail: {
                       status: res.status,
@@ -253,13 +254,18 @@ window.SubsonicAPI = (() => {
               }
             });
           }, () => {
-            throw new Error('Error attempting to fetch subsonic version from given address');
+            throw new TypeError('Error attempting to fetch subsonic version from given address');
           });
       } else {
-        throw new Error('Input must be an object & contain url, user, password & appName fields');
+        throw new TypeError('Input must be an object & contain url, user, password & appName fields');
+        return;
       }
     }
 
+
+    /**
+     * conver object to url query string
+     */
     _toQueryString (params) {
       let r = [];
       for (let n in params) {
@@ -350,6 +356,10 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * compare 2 api versions ** I did not write this function **
+     */
     _versionCompare (v1, v2, options) {
       let lexicographical = options && options.lexicographical,
         zeroExtend = options && options.zeroExtend,
@@ -399,7 +409,7 @@ window.SubsonicAPI = (() => {
         let url = this._buildUrl('getUser', {
           username: this._user
         });
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           this.userPermissions = e.target.response['subsonic-response'].user;
           resolve(this.userPermissions);
         })
@@ -423,7 +433,7 @@ window.SubsonicAPI = (() => {
     ping () {
       return new Promise((resolve, reject) => {
         let url = this._buildUrl('ping');
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'];
           resolve(res);
         }, (e) => {
@@ -455,7 +465,7 @@ window.SubsonicAPI = (() => {
             return {};
           }
         })());
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'].playlists;
           resolve((() => {
             if (res.hasOwnProperty('playlist')) {
@@ -475,7 +485,7 @@ window.SubsonicAPI = (() => {
     getMusicFolders () {
       return new Promise((resolve, reject) => {
         let url = this._buildUrl('getMusicFolders');
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'].musicFolders.musicFolder;
           resolve(res);
         }, reject);
@@ -499,7 +509,7 @@ window.SubsonicAPI = (() => {
             return;
           }
         })(id));
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res =  e.target.response['subsonic-response'].indexes.index;
           resolve(res);
         }, reject);
@@ -522,7 +532,7 @@ window.SubsonicAPI = (() => {
         let url = this._buildUrl('getMusicDirectory', {
           id: id
         });
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'].directory;
           resolve(res);
         }, reject);
@@ -530,15 +540,21 @@ window.SubsonicAPI = (() => {
     }
 
 
+    /**
+     * without id: Similar to getIndexes, but organizes music according to ID3 tags.
+     * with id: Returns details for an artist, including a list of albums. This method organizes music according to ID3 tags.
+     *
+     * @param {Number} id
+     */
     getArtist (id) {
       return new Promise((resolve, reject) => {
-        let url = this._buildUrl(((id) => {
+        let url = this._buildUrl((id => {
           if (id) {
             return 'getArtist';
           } else {
             return 'getArtists';
           }
-        })(id), ((id) => {
+        })(id), (id => {
           if (id) {
             return {
               id: id
@@ -547,7 +563,7 @@ window.SubsonicAPI = (() => {
             return;
           }
         })(id));
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = ((id, e) => {
             if (id) {
               let res = e.target.response['subsonic-response'].artist;
@@ -565,26 +581,27 @@ window.SubsonicAPI = (() => {
     }
 
 
+    /**
+     * Streams a given media file.
+     *
+     * @param {Number} id
+     * @param {Number} bitRate
+     */
     streamUrl (id, bitRate) {
-      return this._buildUrl('stream', ((id, bitRate) => {
-        switch (true) {
-          case (Boolean(bitRate)):
-            return {
-              id: id,
-              maxBitRate: bitRate,
-              estimateContentLength: true
-            };
-            break;
-          default:
-            return {
-              id: id,
-              maxBitRate: 320,
-              estimateContentLength: true
-            };
-        }
-      })(id, bitRate));
+      return this._buildUrl('stream', {
+        id: id,
+        maxBitRate: bitRate || 320,
+        estimateContentLength: true
+      });
     }
 
+
+    /**
+     * Downloads a given media file.
+     * Similar to stream, but this method returns the original media data without transcoding or downsampling.
+     *
+     * @param {Number} id
+     */
     downloadUrl (id) {
       if (!id) {
         throw new Error('id required');
@@ -595,24 +612,34 @@ window.SubsonicAPI = (() => {
       });
     }
 
-    getTopSongs (count, artist) {
+
+    /**
+     * Returns top songs for the given artist, using data from last.fm.
+     *
+     * @param {Number} count
+     * @param {String} artist
+     */
+    getTopSongs (artist, count) {
       return new Promise((resolve, reject) => {
         if (!artist) throw new Error('artist name is required');
         let url = this._buildUrl('getTopSongs', {
           count: count || 50,
           artist: artist
         });
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'].topSongs.song;
           resolve(res);
         }, reject);
       });
     }
 
+    /**
+     * Returns all genres.
+     */
     getGenres () {
       return new Promise((resolve, reject) => {
         let url = this._buildUrl('getGenres');
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'].genres.genre;
           resolve(res);
         }, reject);
@@ -620,6 +647,12 @@ window.SubsonicAPI = (() => {
     }
 
 
+    /**
+     * Returns details for an album, including a list of songs.
+     * This method organizes music according to ID3 tags.
+     *
+     * @param {Number} id
+     */
     getAlbum (id) {
       return new Promise((resolve, reject) => {
         if (!id) {
@@ -629,7 +662,7 @@ window.SubsonicAPI = (() => {
         let url = this._buildUrl('getAlbum', {
           id: id
         });
-        this._xhr(url).then((e) => {
+        this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'].album;
           resolve(res);
         }, reject);
@@ -656,7 +689,7 @@ window.SubsonicAPI = (() => {
           };
           if (folderId) reqObj.musicFolderId = folderId;
           let url = this._buildUrl('getAlbumList', reqObj);
-          this._xhr(url).then((e) => {
+          this._xhr(url).then(e => {
             let res = e.target.response['subsonic-response'].albumList.album;
             resolve(res);
           }, reject);
@@ -686,7 +719,7 @@ window.SubsonicAPI = (() => {
           };
           if (folderId) reqObj.musicFolderId = folderId;
           let url = this._buildUrl('getAlbumList2', reqObj);
-          this._xhr(url).then((e) => {
+          this._xhr(url).then(e => {
             let res = e.target.response['subsonic-response'].albumList2.album;
             resolve(res);
           }, reject);
@@ -818,3 +851,4 @@ window.SubsonicAPI = (() => {
 
   return SubsonicAPI;
 })();
+

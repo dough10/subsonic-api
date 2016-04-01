@@ -215,6 +215,7 @@ window.SubsonicAPI = function () {
 
       if (typeof obj !== 'object') {
         throw new Error('Input must be an object & contain url, user, password & appName fields');
+        return;
       }
       if (obj.hasOwnProperty('ip') && obj.hasOwnProperty('port') && obj.hasOwnProperty('user') && obj.hasOwnProperty('password') && obj.hasOwnProperty('appName') && obj.hasOwnProperty('https')) {
         if (!obj.md5Auth) {
@@ -259,12 +260,18 @@ window.SubsonicAPI = function () {
             }
           });
         }, function () {
-          throw new Error('Error attempting to fetch subsonic version from given address');
+          throw new TypeError('Error attempting to fetch subsonic version from given address');
         });
       } else {
-        throw new Error('Input must be an object & contain url, user, password & appName fields');
+        throw new TypeError('Input must be an object & contain url, user, password & appName fields');
+        return;
       }
     }
+
+    /**
+     * conver object to url query string
+     */
+
 
     _createClass(SubsonicAPI, [{
       key: '_toQueryString',
@@ -369,6 +376,11 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * compare 2 api versions ** I did not write this function **
+       */
+
     }, {
       key: '_versionCompare',
       value: function _versionCompare(v1, v2, options) {
@@ -577,6 +589,14 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * without id: Similar to getIndexes, but organizes music according to ID3 tags.
+       * with id: Returns details for an artist, including a list of albums. This method organizes music according to ID3 tags.
+       *
+       * @param {Number} id
+       */
+
     }, {
       key: 'getArtist',
       value: function getArtist(id) {
@@ -614,27 +634,31 @@ window.SubsonicAPI = function () {
           });
         });
       }
+
+      /**
+       * Streams a given media file.
+       *
+       * @param {Number} id
+       * @param {Number} bitRate
+       */
+
     }, {
       key: 'streamUrl',
       value: function streamUrl(id, bitRate) {
-        return this._buildUrl('stream', function (id, bitRate) {
-          switch (true) {
-            case Boolean(bitRate):
-              return {
-                id: id,
-                maxBitRate: bitRate,
-                estimateContentLength: true
-              };
-              break;
-            default:
-              return {
-                id: id,
-                maxBitRate: 320,
-                estimateContentLength: true
-              };
-          }
-        }(id, bitRate));
+        return this._buildUrl('stream', {
+          id: id,
+          maxBitRate: bitRate || 320,
+          estimateContentLength: true
+        });
       }
+
+      /**
+       * Downloads a given media file.
+       * Similar to stream, but this method returns the original media data without transcoding or downsampling.
+       *
+       * @param {Number} id
+       */
+
     }, {
       key: 'downloadUrl',
       value: function downloadUrl(id) {
@@ -646,9 +670,17 @@ window.SubsonicAPI = function () {
           id: id
         });
       }
+
+      /**
+       * Returns top songs for the given artist, using data from last.fm.
+       *
+       * @param {Number} count
+       * @param {String} artist
+       */
+
     }, {
       key: 'getTopSongs',
-      value: function getTopSongs(count, artist) {
+      value: function getTopSongs(artist, count) {
         var _this11 = this;
 
         return new Promise(function (resolve, reject) {
@@ -663,6 +695,11 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns all genres.
+       */
+
     }, {
       key: 'getGenres',
       value: function getGenres() {
@@ -676,6 +713,14 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns details for an album, including a list of songs.
+       * This method organizes music according to ID3 tags.
+       *
+       * @param {Number} id
+       */
+
     }, {
       key: 'getAlbum',
       value: function getAlbum(id) {
