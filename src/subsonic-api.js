@@ -269,6 +269,13 @@ window.SubsonicAPI = (() => {
       return r.join('&');
     }
 
+
+    /**
+     * return subsonic api url
+     *
+     * @param {String} method
+     * @param {Object} options
+     */
     _buildUrl (method, options) {
       if (options !== null && typeof options === 'object') {
         options = '&' + this._toQueryString(options);
@@ -297,6 +304,11 @@ window.SubsonicAPI = (() => {
     }
 
 
+    /**
+     * send xmlHttpRequest to the given url
+     *
+     * @param {String} url
+     */
     _xhr (url) {
       return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
@@ -310,6 +322,11 @@ window.SubsonicAPI = (() => {
     }
 
 
+    /**
+     * generates a string of the given length
+     *
+     * @param {Number} length
+     */
     _makeSalt (length) {
       let text = "";
       let possible = "ABCD/EFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -318,6 +335,12 @@ window.SubsonicAPI = (() => {
       return text;
     }
 
+
+    /**
+     * ping given url to detect api version
+     *
+     * @param {String} url
+     */
     _fishVersion (url) {
       return new Promise((resolve, reject) => {
         this._xhr(url + '/rest/ping.view?f=json').then((e) => {
@@ -366,6 +389,11 @@ window.SubsonicAPI = (() => {
       return 0;
     }
 
+
+    /**
+     * Get details about the user, including which authorization roles and folder access it has.
+     * Can be used to enable/disable certain features in the client, such as jukebox control.
+     */
     getUserInfo () {
       return new Promise((resolve, reject) => {
         let url = this._buildUrl('getUser', {
@@ -378,12 +406,20 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * abort the last api call
+     */
     abort () {
       if (this._lastXhr) {
         this._lastXhr.abort();
       }
     }
 
+
+    /**
+     * Used to test connectivity with the server. Takes no extra parameters.
+     */
     ping () {
       return new Promise((resolve, reject) => {
         let url = this._buildUrl('ping');
@@ -397,7 +433,10 @@ window.SubsonicAPI = (() => {
     }
 
     /**
-     * if no id is given all playlists will be returned
+     *  without ID: Returns all playlists a user is allowed to play.
+     * with ID: Returns a listing of files in a saved playlist.
+     *
+     * @param {Number} id
      */
     getPlaylist (id) {
       return new Promise((resolve, reject) => {
@@ -429,6 +468,10 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * Returns all configured top-level music folders. Takes no extra parameters.
+     */
     getMusicFolders () {
       return new Promise((resolve, reject) => {
         let url = this._buildUrl('getMusicFolders');
@@ -439,12 +482,18 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * Returns an indexed structure of all artists.
+     *
+     * @param {Number} id
+     */
     getIndexes (id) {
       return new Promise((resolve, reject) => {
-        let url = this._buildUrl('getIndexes', ((i) => {
-          if (i) {
+        let url = this._buildUrl('getIndexes', (id => {
+          if (id) {
             return {
-              musicFolderId: i
+              musicFolderId: id
             };
           } else {
             return;
@@ -457,19 +506,26 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * Returns a listing of all files in a music directory.
+     * Typically used to get list of albums for an artist, or list of songs for an album.
+     *
+     * @param {Number} id
+     */
     getMusicDirectory (id) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required to look up a music directory');
-        } else {
-          let url = this._buildUrl('getMusicDirectory', {
-            id: id
-          });
-          this._xhr(url).then((e) => {
-            let res = e.target.response['subsonic-response'].directory;
-            resolve(res);
-          }, reject);
+          throw new Error('id required');
+          return;
         }
+        let url = this._buildUrl('getMusicDirectory', {
+          id: id
+        });
+        this._xhr(url).then((e) => {
+          let res = e.target.response['subsonic-response'].directory;
+          resolve(res);
+        }, reject);
       });
     }
 
@@ -566,7 +622,10 @@ window.SubsonicAPI = (() => {
 
     getAlbum (id) {
       return new Promise((resolve, reject) => {
-        if (!id) throw new Error('id required');
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
         let url = this._buildUrl('getAlbum', {
           id: id
         });
@@ -577,13 +636,56 @@ window.SubsonicAPI = (() => {
       });
     }
 
-    getAlbumList2 (sort, count) {
+
+    /**
+     * Returns a list of random, newest, highest rated etc. albums.
+     * Similar to the album lists on the home page of the Subsonic web interface.
+     *
+     * @param {String} sort
+     * @param {Number} count
+     * @param {Number} offset
+     * @param {Number} folderId
+     */
+    getAlbumList (sort, count, offset, folderId) {
       return new Promise((resolve, reject) => {
         if (sort) {
-          let url = this._buildUrl('getAlbumList2', {
+          let reqObj = {
             size: count || 60,
+            offset: offset || 0,
             type: sort
-          });
+          };
+          if (folderId) reqObj.musicFolderId = folderId;
+          let url = this._buildUrl('getAlbumList', reqObj);
+          this._xhr(url).then((e) => {
+            let res = e.target.response['subsonic-response'].albumList.album;
+            resolve(res);
+          }, reject);
+        } else {
+          throw new Error('sort method required');
+        }
+
+      });
+    }
+
+
+    /**
+     * Similar to getAlbumList, but organizes music according to ID3 tags.
+     *
+     * @param {String} sort
+     * @param {Number} count
+     * @param {Number} offset
+     * @param {Number} folderId
+     */
+    getAlbumList2 (sort, count, offset, folderId) {
+      return new Promise((resolve, reject) => {
+        if (sort) {
+          let reqObj = {
+            size: count || 60,
+            offset: offset || 0,
+            type: sort
+          };
+          if (folderId) reqObj.musicFolderId = folderId;
+          let url = this._buildUrl('getAlbumList2', reqObj);
           this._xhr(url).then((e) => {
             let res = e.target.response['subsonic-response'].albumList2.album;
             resolve(res);
@@ -591,7 +693,125 @@ window.SubsonicAPI = (() => {
         } else {
           throw new Error('sort method required');
         }
+      });
+    }
 
+
+    /**
+     *  Returns artist info with biography, image URLs and similar artists, using data from last.fm.
+     *
+     * @param {Number} id
+     * @param {Number} count
+     */
+    getArtistInfo (id, count) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('getArtistInfo', {
+          id: id,
+          count: count || 60
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].artistInfo;
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * Similar to getArtistInfo, but organizes music according to ID3 tags.
+     *
+     * @param {Number} id
+     * @param {Number} count
+     */
+    getArtistInfo2 (id, count) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        };
+        let url = this._buildUrl('getArtistInfo2', {
+          id: id,
+          count: count || 60
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].artistInfo2;
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     *  Returns a random collection of songs from the given artist and similar artists, using data from last.fm.
+     *  Typically used for artist radio features.
+     *
+     * @param {Number} id
+     * @param {Number} count
+     */
+    getSimilarSongs (id, count) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('getSimilarSongs', {
+          id: id,
+          count: count || 60
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].similarSongs;
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * Similar to getSimilarSongs, but organizes music according to ID3 tags.
+     *
+     * @param {Number} id
+     * @param {Number} count
+     */
+    getSimilarSongs2 (id, count) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('getSimilarSongs2', {
+          id: id,
+          count: count || 60
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].similarSongs2;
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * Returns details for a song.
+     *
+     * @param {Number} id
+     */
+    getSong (id) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('getSong', {
+          id: id
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'];
+          resolve(res);
+        }, reject);
       });
     }
   }

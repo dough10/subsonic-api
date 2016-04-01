@@ -276,6 +276,14 @@ window.SubsonicAPI = function () {
         }
         return r.join('&');
       }
+
+      /**
+       * return subsonic api url
+       *
+       * @param {String} method
+       * @param {Object} options
+       */
+
     }, {
       key: '_buildUrl',
       value: function _buildUrl(method, options) {
@@ -304,6 +312,13 @@ window.SubsonicAPI = function () {
           return this._url + '/rest/' + method + '.view?' + this._toQueryString(this.params) + options;
         }
       }
+
+      /**
+       * send xmlHttpRequest to the given url
+       *
+       * @param {String} url
+       */
+
     }, {
       key: '_xhr',
       value: function _xhr(url) {
@@ -319,6 +334,13 @@ window.SubsonicAPI = function () {
           _this2._lastXhr = xhr;
         });
       }
+
+      /**
+       * generates a string of the given length
+       *
+       * @param {Number} length
+       */
+
     }, {
       key: '_makeSalt',
       value: function _makeSalt(length) {
@@ -328,6 +350,13 @@ window.SubsonicAPI = function () {
           text += possible.charAt(Math.floor(Math.random() * possible.length));
         }return text;
       }
+
+      /**
+       * ping given url to detect api version
+       *
+       * @param {String} url
+       */
+
     }, {
       key: '_fishVersion',
       value: function _fishVersion(url) {
@@ -381,6 +410,12 @@ window.SubsonicAPI = function () {
         }
         return 0;
       }
+
+      /**
+       * Get details about the user, including which authorization roles and folder access it has.
+       * Can be used to enable/disable certain features in the client, such as jukebox control.
+       */
+
     }, {
       key: 'getUserInfo',
       value: function getUserInfo() {
@@ -396,6 +431,11 @@ window.SubsonicAPI = function () {
           });
         });
       }
+
+      /**
+       * abort the last api call
+       */
+
     }, {
       key: 'abort',
       value: function abort() {
@@ -403,6 +443,11 @@ window.SubsonicAPI = function () {
           this._lastXhr.abort();
         }
       }
+
+      /**
+       * Used to test connectivity with the server. Takes no extra parameters.
+       */
+
     }, {
       key: 'ping',
       value: function ping() {
@@ -420,7 +465,10 @@ window.SubsonicAPI = function () {
       }
 
       /**
-       * if no id is given all playlists will be returned
+       *  without ID: Returns all playlists a user is allowed to play.
+       * with ID: Returns a listing of files in a saved playlist.
+       *
+       * @param {Number} id
        */
 
     }, {
@@ -456,6 +504,11 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns all configured top-level music folders. Takes no extra parameters.
+       */
+
     }, {
       key: 'getMusicFolders',
       value: function getMusicFolders() {
@@ -469,16 +522,23 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns an indexed structure of all artists.
+       *
+       * @param {Number} id
+       */
+
     }, {
       key: 'getIndexes',
       value: function getIndexes(id) {
         var _this8 = this;
 
         return new Promise(function (resolve, reject) {
-          var url = _this8._buildUrl('getIndexes', function (i) {
-            if (i) {
+          var url = _this8._buildUrl('getIndexes', function (id) {
+            if (id) {
               return {
-                musicFolderId: i
+                musicFolderId: id
               };
             } else {
               return;
@@ -490,6 +550,14 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns a listing of all files in a music directory.
+       * Typically used to get list of albums for an artist, or list of songs for an album.
+       *
+       * @param {Number} id
+       */
+
     }, {
       key: 'getMusicDirectory',
       value: function getMusicDirectory(id) {
@@ -497,16 +565,16 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required to look up a music directory');
-          } else {
-            var url = _this9._buildUrl('getMusicDirectory', {
-              id: id
-            });
-            _this9._xhr(url).then(function (e) {
-              var res = e.target.response['subsonic-response'].directory;
-              resolve(res);
-            }, reject);
+            throw new Error('id required');
+            return;
           }
+          var url = _this9._buildUrl('getMusicDirectory', {
+            id: id
+          });
+          _this9._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].directory;
+            resolve(res);
+          }, reject);
         });
       }
     }, {
@@ -614,7 +682,10 @@ window.SubsonicAPI = function () {
         var _this13 = this;
 
         return new Promise(function (resolve, reject) {
-          if (!id) throw new Error('id required');
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
           var url = _this13._buildUrl('getAlbum', {
             id: id
           });
@@ -624,24 +695,210 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns a list of random, newest, highest rated etc. albums.
+       * Similar to the album lists on the home page of the Subsonic web interface.
+       *
+       * @param {String} sort
+       * @param {Number} count
+       * @param {Number} offset
+       * @param {Number} folderId
+       */
+
     }, {
-      key: 'getAlbumList2',
-      value: function getAlbumList2(sort, count) {
+      key: 'getAlbumList',
+      value: function getAlbumList(sort, count, offset, folderId) {
         var _this14 = this;
 
         return new Promise(function (resolve, reject) {
           if (sort) {
-            var url = _this14._buildUrl('getAlbumList2', {
+            var reqObj = {
               size: count || 60,
+              offset: offset || 0,
               type: sort
-            });
+            };
+            if (folderId) reqObj.musicFolderId = folderId;
+            var url = _this14._buildUrl('getAlbumList', reqObj);
             _this14._xhr(url).then(function (e) {
+              var res = e.target.response['subsonic-response'].albumList.album;
+              resolve(res);
+            }, reject);
+          } else {
+            throw new Error('sort method required');
+          }
+        });
+      }
+
+      /**
+       * Similar to getAlbumList, but organizes music according to ID3 tags.
+       *
+       * @param {String} sort
+       * @param {Number} count
+       * @param {Number} offset
+       * @param {Number} folderId
+       */
+
+    }, {
+      key: 'getAlbumList2',
+      value: function getAlbumList2(sort, count, offset, folderId) {
+        var _this15 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (sort) {
+            var reqObj = {
+              size: count || 60,
+              offset: offset || 0,
+              type: sort
+            };
+            if (folderId) reqObj.musicFolderId = folderId;
+            var url = _this15._buildUrl('getAlbumList2', reqObj);
+            _this15._xhr(url).then(function (e) {
               var res = e.target.response['subsonic-response'].albumList2.album;
               resolve(res);
             }, reject);
           } else {
             throw new Error('sort method required');
           }
+        });
+      }
+
+      /**
+       *  Returns artist info with biography, image URLs and similar artists, using data from last.fm.
+       *
+       * @param {Number} id
+       * @param {Number} count
+       */
+
+    }, {
+      key: 'getArtistInfo',
+      value: function getArtistInfo(id, count) {
+        var _this16 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this16._buildUrl('getArtistInfo', {
+            id: id,
+            count: count || 60
+          });
+          _this16._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].artistInfo;
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * Similar to getArtistInfo, but organizes music according to ID3 tags.
+       *
+       * @param {Number} id
+       * @param {Number} count
+       */
+
+    }, {
+      key: 'getArtistInfo2',
+      value: function getArtistInfo2(id, count) {
+        var _this17 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          };
+          var url = _this17._buildUrl('getArtistInfo2', {
+            id: id,
+            count: count || 60
+          });
+          _this17._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].artistInfo2;
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       *  Returns a random collection of songs from the given artist and similar artists, using data from last.fm.
+       *  Typically used for artist radio features.
+       *
+       * @param {Number} id
+       * @param {Number} count
+       */
+
+    }, {
+      key: 'getSimilarSongs',
+      value: function getSimilarSongs(id, count) {
+        var _this18 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this18._buildUrl('getSimilarSongs', {
+            id: id,
+            count: count || 60
+          });
+          _this18._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].similarSongs;
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * Similar to getSimilarSongs, but organizes music according to ID3 tags.
+       *
+       * @param {Number} id
+       * @param {Number} count
+       */
+
+    }, {
+      key: 'getSimilarSongs2',
+      value: function getSimilarSongs2(id, count) {
+        var _this19 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this19._buildUrl('getSimilarSongs2', {
+            id: id,
+            count: count || 60
+          });
+          _this19._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].similarSongs2;
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * Returns details for a song.
+       *
+       * @param {Number} id
+       */
+
+    }, {
+      key: 'getSong',
+      value: function getSong(id) {
+        var _this20 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this20._buildUrl('getSong', {
+            id: id
+          });
+          _this20._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'];
+            resolve(res);
+          }, reject);
         });
       }
     }]);
