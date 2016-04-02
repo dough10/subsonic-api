@@ -847,6 +847,50 @@ window.SubsonicAPI = (() => {
         }, reject);
       });
     }
+
+
+    /**
+     * Returns starred songs, albums and artists.
+     */
+    getStarred (folderId) {
+      return new Promise((resolve, reject) => {
+        let url = this._buildUrl('getStarred', (() => {
+          if (folderId) {
+            return {
+              musicFolderId: folderId
+            };
+          } else {
+            return;
+          }
+        })());
+        this._xhr(url).then(e => {
+          let res = e.target.resolve['subsonic-response'].starred;
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * Similar to getStarred, but organizes music according to ID3 tags.
+     */
+    getStarred2 (folderId) {
+      return new Promise((resolve, reject) => {
+        let url = this._buildUrl('getStarred2', (() => {
+          if (folderId) {
+            return {
+              musicFolderId: folderId
+            };
+          } else {
+            return;
+          }
+        })());
+        this._xhr(url).then(e => {
+          let res = e.target.resolve['subsonic-response'].starred2;
+          resolve(res);
+        }, reject);
+      });
+    }
   }
 
   return SubsonicAPI;

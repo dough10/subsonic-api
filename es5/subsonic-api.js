@@ -946,6 +946,58 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns starred songs, albums and artists.
+       */
+
+    }, {
+      key: 'getStarred',
+      value: function getStarred(folderId) {
+        var _this21 = this;
+
+        return new Promise(function (resolve, reject) {
+          var url = _this21._buildUrl('getStarred', function () {
+            if (folderId) {
+              return {
+                musicFolderId: folderId
+              };
+            } else {
+              return;
+            }
+          }());
+          _this21._xhr(url).then(function (e) {
+            var res = e.target.resolve['subsonic-response'].starred;
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * Similar to getStarred, but organizes music according to ID3 tags.
+       */
+
+    }, {
+      key: 'getStarred2',
+      value: function getStarred2(folderId) {
+        var _this22 = this;
+
+        return new Promise(function (resolve, reject) {
+          var url = _this22._buildUrl('getStarred2', function () {
+            if (folderId) {
+              return {
+                musicFolderId: folderId
+              };
+            } else {
+              return;
+            }
+          }());
+          _this22._xhr(url).then(function (e) {
+            var res = e.target.resolve['subsonic-response'].starred2;
+            resolve(res);
+          }, reject);
+        });
+      }
     }]);
 
     return SubsonicAPI;
