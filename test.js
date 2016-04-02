@@ -19,11 +19,11 @@
       output('starting subsonic-api.js test script');
 
       var subsonic = new SubsonicAPI({
-        https: false,
-        ip: 'dough10.me',
-        port: 4040,
-        user: 'admin',
-        password: 'oicu812bitch',
+        https: true,
+        ip: 'subsonic.monstermuffin.org',
+        port: 443,
+        user: 'GuestUser',
+        password: 'GuestPassword',
         appName: 'SubsonicAPI Test'
       });
 
@@ -42,7 +42,6 @@
                 output('got tracks on the album: ' + albums.child[0].title + ' by '  + albums.child[0].artist);
                 subsonic.getMusicDirectory(albums.child[_randomNumber(0, albums.child.length - 1)].id).then(tracks => {
                   let toPlay = tracks.child[_randomNumber(0, tracks.child.length - 1)];
-                  console.log(toPlay);
                   output('playing a random track from ' + tracks.name + ' named ' + toPlay.title);
                   let audio = new Audio();
                   audio.src = subsonic.streamUrl(toPlay.id, 96);
