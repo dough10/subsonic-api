@@ -61,10 +61,16 @@
                           output(genres.length + ' genres');
                           subsonic.getAlbumList2('newest', 60, 0).then(albums => {
                             output(albums[0].name + ' is the newest album');
-                            subsonic.getAlbum(albums[_randomNumber(0, albums.length - 1)].id).then(album => {
-                              output(album.name + ' info fetched')
-                              subsonic.getArtistInfo2(album.artistId).then(info => {
-                                console.log(info)
+                            subsonic.getCoverArt('al-' + albums[0].id, 500).then(blob => {
+                              let imgUrl = window.URL.createObjectURL(blob);
+                              let img = new Image();
+                              img.src = imgUrl;
+                              document.querySelector('body').appendChild(img);
+                              subsonic.getAlbum(albums[_randomNumber(0, albums.length - 1)].id).then(album => {
+                                output(album.name + ' info fetched')
+                                subsonic.getArtistInfo2(album.artistId).then(info => {
+                                  console.log(info)
+                                });
                               });
                             });
                           });

@@ -315,11 +315,11 @@ window.SubsonicAPI = (() => {
      *
      * @param {String} url
      */
-    _xhr (url) {
+    _xhr (url, dataType) {
       return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
-        xhr.responseType = 'json';
+        xhr.responseType = dataType || 'json';
         xhr.onload = resolve;
         xhr.onerror = reject;
         xhr.send();
@@ -891,8 +891,24 @@ window.SubsonicAPI = (() => {
         }, reject);
       });
     }
+
+    getCoverArt (id, size) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('getCoverArt', {
+          id: id,
+          size: size
+        });
+        this._xhr(url, 'blob').then(e => {
+          let blob = e.target.response;
+          resolve(blob);
+        }, reject);
+      });
+    }
   }
 
   return SubsonicAPI;
 })();
-

@@ -19,7 +19,6 @@ module.exports = function(grunt) {
         plugins: [
           "transform-es2015-arrow-functions",
           "transform-es2015-classes",
-          "check-es2015-constants",
           "transform-es2015-block-scoping"
         ]
       },

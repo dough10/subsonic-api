@@ -328,13 +328,13 @@ window.SubsonicAPI = function () {
 
     }, {
       key: '_xhr',
-      value: function _xhr(url) {
+      value: function _xhr(url, dataType) {
         var _this2 = this;
 
         return new Promise(function (resolve, reject) {
           var xhr = new XMLHttpRequest();
           xhr.open("GET", url, true);
-          xhr.responseType = 'json';
+          xhr.responseType = dataType || 'json';
           xhr.onload = resolve;
           xhr.onerror = reject;
           xhr.send();
@@ -995,6 +995,26 @@ window.SubsonicAPI = function () {
           _this22._xhr(url).then(function (e) {
             var res = e.target.resolve['subsonic-response'].starred2;
             resolve(res);
+          }, reject);
+        });
+      }
+    }, {
+      key: 'getCoverArt',
+      value: function getCoverArt(id, size) {
+        var _this23 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this23._buildUrl('getCoverArt', {
+            id: id,
+            size: size
+          });
+          _this23._xhr(url, 'blob').then(function (e) {
+            var blob = e.target.response;
+            resolve(blob);
           }, reject);
         });
       }
