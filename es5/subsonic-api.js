@@ -1030,6 +1030,106 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Attaches a star to a song, album or artist.
+       *
+       * @param {Number} id
+       */
+
+    }, {
+      key: 'star',
+      value: function star(id) {
+        var _this24 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this24._buildUrl('star', {
+            id: id
+          });
+          _this24._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'];
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * Removes the star from a song, album or artist.
+       *
+       * @param {Number} id
+       */
+
+    }, {
+      key: 'unstar',
+      value: function unstar(id) {
+        var _this25 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!id) {
+            throw new Error('id required');
+            return;
+          }
+          var url = _this25._buildUrl('unstar', {
+            id: id
+          });
+          _this25._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'];
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * Sets the rating for a music file.
+       *
+       * @param {Number} id
+       * @param {Number} rating
+       */
+
+    }, {
+      key: 'setRating',
+      value: function setRating(id, rating) {
+        var _this26 = this;
+
+        return new Promise(function (resolve, reject) {
+          var url = _this26._buildUrl('setRating', {
+            id: id,
+            rating: rating
+          });
+          _this26._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'];
+            resolve(res);
+          }, reject);
+        });
+      }
+
+      /**
+       * "Scrobbles" a given music file on last.fm.
+       * Requires that the user has configured his/her last.fm credentials on the Subsonic server (Settings > Personal).
+       *
+       * @param {Number} id
+       */
+
+    }, {
+      key: 'scrobble',
+      value: function scrobble(id) {
+        var _this27 = this;
+
+        return new Promise(function (resolve, reject) {
+          var url = _this27._buildUrl('scrobble', {
+            id: id,
+            time: new Date().getTime()
+          });
+          _this27._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'];
+            resolve(res);
+          }, reject);
+        });
+      }
     }]);
 
     return SubsonicAPI;

@@ -919,6 +919,90 @@ window.SubsonicAPI = (() => {
         }, reject);
       });
     }
+
+
+    /**
+     * Attaches a star to a song, album or artist.
+     *
+     * @param {Number} id
+     */
+    star (id) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('star', {
+          id: id
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'];
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * Removes the star from a song, album or artist.
+     *
+     * @param {Number} id
+     */
+    unstar (id) {
+      return new Promise((resolve, reject) => {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
+        let url = this._buildUrl('unstar', {
+          id: id
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'];
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * Sets the rating for a music file.
+     *
+     * @param {Number} id
+     * @param {Number} rating
+     */
+    setRating (id, rating) {
+      return new Promise((resolve, reject) => {
+        let url = this._buildUrl('setRating', {
+          id: id,
+          rating: rating
+        });
+        this._xhr(url).then(e => {
+          let res = e.target. response['subsonic-response'];
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    /**
+     * "Scrobbles" a given music file on last.fm.
+     * Requires that the user has configured his/her last.fm credentials on the Subsonic server (Settings > Personal).
+     *
+     * @param {Number} id
+     */
+    scrobble (id) {
+      return new Promise((resolve, reject) => {
+        let url = this._buildUrl('scrobble', {
+          id: id,
+          time: new Date().getTime()
+        });
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'];
+          resolve(res);
+        }, reject);
+      });
+    }
   }
 
   return SubsonicAPI;
