@@ -462,7 +462,7 @@ window.SubsonicAPI = (() => {
               id: id
             };
           } else {
-            return {};
+            return;
           }
         })());
         this._xhr(url).then(e => {
@@ -588,6 +588,10 @@ window.SubsonicAPI = (() => {
      * @param {Number} bitRate
      */
     streamUrl (id, bitRate) {
+      if (!id) {
+        throw new Error('id required');
+        return;
+      }
       return this._buildUrl('stream', {
         id: id,
         maxBitRate: bitRate || 320,
@@ -739,7 +743,9 @@ window.SubsonicAPI = (() => {
     getArtistInfo (id, count) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('getArtistInfo', {
@@ -763,7 +769,9 @@ window.SubsonicAPI = (() => {
     getArtistInfo2 (id, count) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         };
         let url = this._buildUrl('getArtistInfo2', {
@@ -788,7 +796,9 @@ window.SubsonicAPI = (() => {
     getSimilarSongs (id, count) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('getSimilarSongs', {
@@ -812,7 +822,9 @@ window.SubsonicAPI = (() => {
     getSimilarSongs2 (id, count) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('getSimilarSongs2', {
@@ -835,7 +847,9 @@ window.SubsonicAPI = (() => {
     getSong (id) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('getSong', {
@@ -906,7 +920,9 @@ window.SubsonicAPI = (() => {
     getCoverArt (id, size) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('getCoverArt', {
@@ -929,7 +945,9 @@ window.SubsonicAPI = (() => {
     star (id) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('star', {
@@ -951,7 +969,9 @@ window.SubsonicAPI = (() => {
     unstar (id) {
       return new Promise((resolve, reject) => {
         if (!id) {
-          throw new Error('id required');
+          let err = new Error('id required');
+          throw err;
+          reject(err);
           return;
         }
         let url = this._buildUrl('unstar', {
@@ -973,6 +993,12 @@ window.SubsonicAPI = (() => {
      */
     setRating (id, rating) {
       return new Promise((resolve, reject) => {
+        if (!id) {
+          let err = new Error('id required');
+          throw err;
+          reject(err);
+          return;
+        }
         let url = this._buildUrl('setRating', {
           id: id,
           rating: rating
@@ -993,12 +1019,34 @@ window.SubsonicAPI = (() => {
      */
     scrobble (id) {
       return new Promise((resolve, reject) => {
+        if (!id) {
+          let err = new Error('id required');
+          throw err;
+          reject(err);
+          return;
+        }
         let url = this._buildUrl('scrobble', {
           id: id,
           time: new Date().getTime()
         });
         this._xhr(url).then(e => {
           let res = e.target.response['subsonic-response'];
+          resolve(res);
+        }, reject);
+      });
+    }
+
+
+    search (obj) {
+      return new Promise((resolve, reject) => {
+        if (!obj) {
+          let err = new Error('search object required');
+          reject(err);
+          return;
+        }
+        let url = this._buildUrl('search', obj);
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].search;
           resolve(res);
         }, reject);
       });

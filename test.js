@@ -19,11 +19,11 @@
       output('starting subsonic-api.js test script');
 
       var subsonic = new SubsonicAPI({
-        https: true,
-        ip: 'subsonic.monstermuffin.org',
-        port: 443,
-        user: 'GuestUser',
-        password: 'GuestPassword',
+        https: false,
+        ip: 'demo.subsonic.org',
+        port: 80,
+        user: 'guest1',
+        password: 'guest',
         appName: 'SubsonicAPI Test'
       });
 
@@ -69,7 +69,12 @@
                               subsonic.getAlbum(albums[_randomNumber(0, albums.length - 1)].id).then(album => {
                                 output(album.name + ' info fetched')
                                 subsonic.getArtistInfo2(album.artistId).then(info => {
-                                  console.log(info)
+
+                                  subsonic.search({
+                                    artist: album.artist
+                                  }).then(results => {
+                                    console.log(results);
+                                  });
                                 });
                               });
                             });

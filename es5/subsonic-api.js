@@ -501,7 +501,7 @@ window.SubsonicAPI = function () {
                 id: id
               };
             } else {
-              return {};
+              return;
             }
           }());
           _this6._xhr(url).then(function (e) {
@@ -645,6 +645,10 @@ window.SubsonicAPI = function () {
     }, {
       key: 'streamUrl',
       value: function streamUrl(id, bitRate) {
+        if (!id) {
+          throw new Error('id required');
+          return;
+        }
         return this._buildUrl('stream', {
           id: id,
           maxBitRate: bitRate || 320,
@@ -822,7 +826,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this16._buildUrl('getArtistInfo', {
@@ -850,7 +856,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           };
           var url = _this17._buildUrl('getArtistInfo2', {
@@ -879,7 +887,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this18._buildUrl('getSimilarSongs', {
@@ -907,7 +917,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this19._buildUrl('getSimilarSongs2', {
@@ -934,7 +946,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this20._buildUrl('getSong', {
@@ -1017,7 +1031,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this23._buildUrl('getCoverArt', {
@@ -1044,7 +1060,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this24._buildUrl('star', {
@@ -1070,7 +1088,9 @@ window.SubsonicAPI = function () {
 
         return new Promise(function (resolve, reject) {
           if (!id) {
-            throw new Error('id required');
+            var err = new Error('id required');
+            throw err;
+            reject(err);
             return;
           }
           var url = _this25._buildUrl('unstar', {
@@ -1096,6 +1116,12 @@ window.SubsonicAPI = function () {
         var _this26 = this;
 
         return new Promise(function (resolve, reject) {
+          if (!id) {
+            var err = new Error('id required');
+            throw err;
+            reject(err);
+            return;
+          }
           var url = _this26._buildUrl('setRating', {
             id: id,
             rating: rating
@@ -1120,12 +1146,36 @@ window.SubsonicAPI = function () {
         var _this27 = this;
 
         return new Promise(function (resolve, reject) {
+          if (!id) {
+            var err = new Error('id required');
+            throw err;
+            reject(err);
+            return;
+          }
           var url = _this27._buildUrl('scrobble', {
             id: id,
             time: new Date().getTime()
           });
           _this27._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'];
+            resolve(res);
+          }, reject);
+        });
+      }
+    }, {
+      key: 'search',
+      value: function search(obj) {
+        var _this28 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!obj) {
+            var err = new Error('search object required');
+            reject(err);
+            return;
+          }
+          var url = _this28._buildUrl('search', obj);
+          _this28._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].search;
             resolve(res);
           }, reject);
         });
