@@ -949,6 +949,8 @@ window.SubsonicAPI = function () {
 
       /**
        * Returns starred songs, albums and artists.
+       *
+       * @param {Number} folderId
        */
 
     }, {
@@ -975,6 +977,8 @@ window.SubsonicAPI = function () {
 
       /**
        * Similar to getStarred, but organizes music according to ID3 tags.
+       *
+       * @param {Number} folderId
        */
 
     }, {
@@ -998,6 +1002,14 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns cover art as a blob
+       *
+       * @param {Number} id
+       * @param {Number} size - max image size in px
+       */
+
     }, {
       key: 'getCoverArt',
       value: function getCoverArt(id, size) {
@@ -1010,7 +1022,7 @@ window.SubsonicAPI = function () {
           }
           var url = _this23._buildUrl('getCoverArt', {
             id: id,
-            size: size
+            size: size || 500
           });
           _this23._xhr(url, 'blob').then(function (e) {
             var blob = e.target.response;

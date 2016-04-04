@@ -851,6 +851,8 @@ window.SubsonicAPI = (() => {
 
     /**
      * Returns starred songs, albums and artists.
+     *
+     * @param {Number} folderId
      */
     getStarred (folderId) {
       return new Promise((resolve, reject) => {
@@ -873,6 +875,8 @@ window.SubsonicAPI = (() => {
 
     /**
      * Similar to getStarred, but organizes music according to ID3 tags.
+     *
+     * @param {Number} folderId
      */
     getStarred2 (folderId) {
       return new Promise((resolve, reject) => {
@@ -892,6 +896,13 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * Returns cover art as a blob
+     *
+     * @param {Number} id
+     * @param {Number} size - max image size in px
+     */
     getCoverArt (id, size) {
       return new Promise((resolve, reject) => {
         if (!id) {
@@ -900,7 +911,7 @@ window.SubsonicAPI = (() => {
         }
         let url = this._buildUrl('getCoverArt', {
           id: id,
-          size: size
+          size: size || 500
         });
         this._xhr(url, 'blob').then(e => {
           let blob = e.target.response;
