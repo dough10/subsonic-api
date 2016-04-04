@@ -15,7 +15,8 @@ Usage Example
         port: PORT,
         user: 'Username',
         password: 'Password',
-        appName: 'App Name'
+        appName: 'App Name',
+        md5Auth: true
       });
 
       document.addEventListener('subsonicApi-ready', event => {
