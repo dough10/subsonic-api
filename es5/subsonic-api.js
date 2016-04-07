@@ -229,10 +229,22 @@ window.SubsonicAPI = function () {
         this._user = obj.user;
         this._md5Auth = obj.md5Auth;
         this._url = function () {
+          var portString = void 0;
+          switch (obj.port) {
+            case 80:
+              portString = '';
+              break;
+            case 443:
+              portString = '';
+              break;
+            default:
+              portString = ':' + obj.port;
+              break;
+          }
           if (obj.https) {
-            return 'https://' + obj.ip + ':' + obj.port;
+            return 'https://' + obj.ip + portString;
           } else {
-            return 'http://' + obj.ip + ':' + obj.port;
+            return 'http://' + obj.ip + portString;
           }
         }();
         this._password = obj.password;
@@ -1175,7 +1187,7 @@ window.SubsonicAPI = function () {
           }
           var url = _this28._buildUrl('search', obj);
           _this28._xhr(url).then(function (e) {
-            var res = e.target.response['subsonic-response'].search;
+            var res = e.target.response['subsonic-response'].searchResult.match;
             resolve(res);
           }, reject);
         });

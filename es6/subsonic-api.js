@@ -223,10 +223,22 @@ window.SubsonicAPI = (() => {
           this._user = obj.user;
           this._md5Auth = obj.md5Auth;
           this._url = (() => {
+            let portString;
+            switch (obj.port) {
+              case (80):
+                portString = '';
+                break;
+              case (443):
+                portString = '';
+                break;
+              default:
+                portString = ':' + obj.port;
+                break;
+            }
             if (obj.https) {
-              return 'https://' + obj.ip + ':' + obj.port;
+              return 'https://' + obj.ip + portString;
             } else {
-              return 'http://' + obj.ip + ':' + obj.port;
+              return 'http://' + obj.ip + portString;
             }
           })();
           this._password = obj.password;
@@ -1046,7 +1058,7 @@ window.SubsonicAPI = (() => {
         }
         let url = this._buildUrl('search', obj);
         this._xhr(url).then(e => {
-          let res = e.target.response['subsonic-response'].search;
+          let res = e.target.response['subsonic-response'].searchResult.match;
           resolve(res);
         }, reject);
       });
