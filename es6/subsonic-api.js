@@ -1063,6 +1063,36 @@ window.SubsonicAPI = (() => {
         }, reject);
       });
     }
+
+    search2 (obj) {
+      return new Promise((resolve, reject) => {
+        if (!obj) {
+          let err = new Error('search object required');
+          reject(err);
+          return;
+        }
+        let url = this._buildUrl('search2', obj);
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].search2Result.match;
+          resolve(res);
+        }, reject);
+      });
+    }
+
+    search3 (obj) {
+      return new Promise((resolve, reject) => {
+        if (!obj) {
+          let err = new Error('search object required');
+          reject(err);
+          return;
+        }
+        let url = this._buildUrl('search3', obj);
+        this._xhr(url).then(e => {
+          let res = e.target.response['subsonic-response'].search3Result.match;
+          resolve(res);
+        }, reject);
+      });
+    }
   }
 
   return SubsonicAPI;

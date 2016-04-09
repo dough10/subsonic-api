@@ -1192,6 +1192,42 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+    }, {
+      key: 'search2',
+      value: function search2(obj) {
+        var _this29 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!obj) {
+            var err = new Error('search object required');
+            reject(err);
+            return;
+          }
+          var url = _this29._buildUrl('search2', obj);
+          _this29._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].search2Result.match;
+            resolve(res);
+          }, reject);
+        });
+      }
+    }, {
+      key: 'search3',
+      value: function search3(obj) {
+        var _this30 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!obj) {
+            var err = new Error('search object required');
+            reject(err);
+            return;
+          }
+          var url = _this30._buildUrl('search3', obj);
+          _this30._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].search3Result.match;
+            resolve(res);
+          }, reject);
+        });
+      }
     }]);
 
     return SubsonicAPI;

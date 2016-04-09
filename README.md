@@ -1,9 +1,7 @@
 # Subsonic-API
-Subsonic API wrapper in plain es6 Javascript with no dependencies.
+Subsonic API in a es6 Javascript Class with no dependencies.
 
-Wrapper is currently incomplete but is in development for use in my Chrome web app PolySonic.
-
-This wrapper will not send login details untill a "ping" response has returned the api version and wrapper knows if it can use md5 authentication authentication method
+Currently incomplete but is in development for use in my Chrome web app PolySonic.
 
 
 Usage Example
