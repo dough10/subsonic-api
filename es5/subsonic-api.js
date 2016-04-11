@@ -1174,6 +1174,13 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns a listing of files matching the given search criteria. Supports paging through the result.
+       *
+       * @param {Object} obj - a object wihsearch params
+       */
+
     }, {
       key: 'search',
       value: function search(obj) {
@@ -1192,6 +1199,13 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       * Returns albums, artists and songs matching the given search criteria. Supports paging through the result.
+       *
+       * @param {Object} obj - a object wihsearch params
+       */
+
     }, {
       key: 'search2',
       value: function search2(obj) {
@@ -1210,6 +1224,13 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+
+      /**
+       *
+       *
+       * @param {Object} obj - a object wihsearch params
+       */
+
     }, {
       key: 'search3',
       value: function search3(obj) {

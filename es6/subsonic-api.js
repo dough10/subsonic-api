@@ -1049,6 +1049,11 @@ window.SubsonicAPI = (() => {
     }
 
 
+    /**
+     * Returns a listing of files matching the given search criteria. Supports paging through the result.
+     *
+     * @param {Object} obj - a object wihsearch params
+     */
     search (obj) {
       return new Promise((resolve, reject) => {
         if (!obj) {
@@ -1064,6 +1069,12 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     * Returns albums, artists and songs matching the given search criteria. Supports paging through the result.
+     *
+     * @param {Object} obj - a object wihsearch params
+     */
     search2 (obj) {
       return new Promise((resolve, reject) => {
         if (!obj) {
@@ -1079,6 +1090,12 @@ window.SubsonicAPI = (() => {
       });
     }
 
+
+    /**
+     *
+     *
+     * @param {Object} obj - a object wihsearch params
+     */
     search3 (obj) {
       return new Promise((resolve, reject) => {
         if (!obj) {
