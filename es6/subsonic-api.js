@@ -552,6 +552,18 @@ window.SubsonicAPI = (() => {
     }
 
 
+
+    getArtists () {
+      return new Promise((resolve, reject) => {
+        let url = this._buildUrl('getArtists');
+        this._xhr(url).then(e => {
+          const res =  e.target.response['subsonic-response'].artists.index;
+          resolve(res);
+        });
+      });
+    }
+
+
     /**
      * without id: Similar to getIndexes, but organizes music according to ID3 tags.
      * with id: Returns details for an artist, including a list of albums. This method organizes music according to ID3 tags.
@@ -560,33 +572,14 @@ window.SubsonicAPI = (() => {
      */
     getArtist (id) {
       return new Promise((resolve, reject) => {
-        let url = this._buildUrl((id => {
-          if (id) {
-            return 'getArtist';
-          } else {
-            return 'getArtists';
-          }
-        })(id), (id => {
-          if (id) {
-            return {
-              id: id
-            };
-          } else {
-            return;
-          }
-        })(id));
+        let url = this._buildUrl('getArtist', {
+          id: id
+        });
         this._xhr(url).then(e => {
-          let res = ((id, e) => {
-            if (id) {
-              let res = e.target.response['subsonic-response'].artist;
-              res.album.sort(function sorting(a, b) {
-                return a.discNumber - b.discNumber || a.track - b.track;
-              });
-              return res;
-            } else {
-              return e.target.response['subsonic-response'].artists.index;
-            }
-          })(id, e);
+          let res = e.target.response['subsonic-response'].artist;
+          res.album.sort(function sorting(a, b) {
+            return a.discNumber - b.discNumber || a.track - b.track;
+          });
           resolve(res);
         });
       });

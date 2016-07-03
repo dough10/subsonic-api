@@ -601,6 +601,19 @@ window.SubsonicAPI = function () {
           }, reject);
         });
       }
+    }, {
+      key: 'getArtists',
+      value: function getArtists() {
+        var _this10 = this;
+
+        return new Promise(function (resolve, reject) {
+          var url = _this10._buildUrl('getArtists');
+          _this10._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].artists.index;
+            resolve(res);
+          });
+        });
+      }
 
       /**
        * without id: Similar to getIndexes, but organizes music according to ID3 tags.
@@ -612,36 +625,17 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getArtist',
       value: function getArtist(id) {
-        var _this10 = this;
+        var _this11 = this;
 
         return new Promise(function (resolve, reject) {
-          var url = _this10._buildUrl(function (id) {
-            if (id) {
-              return 'getArtist';
-            } else {
-              return 'getArtists';
-            }
-          }(id), function (id) {
-            if (id) {
-              return {
-                id: id
-              };
-            } else {
-              return;
-            }
-          }(id));
-          _this10._xhr(url).then(function (e) {
-            var res = function (id, e) {
-              if (id) {
-                var _res = e.target.response['subsonic-response'].artist;
-                _res.album.sort(function sorting(a, b) {
-                  return a.discNumber - b.discNumber || a.track - b.track;
-                });
-                return _res;
-              } else {
-                return e.target.response['subsonic-response'].artists.index;
-              }
-            }(id, e);
+          var url = _this11._buildUrl('getArtist', {
+            id: id
+          });
+          _this11._xhr(url).then(function (e) {
+            var res = e.target.response['subsonic-response'].artist;
+            res.album.sort(function sorting(a, b) {
+              return a.discNumber - b.discNumber || a.track - b.track;
+            });
             resolve(res);
           });
         });
@@ -697,15 +691,15 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getTopSongs',
       value: function getTopSongs(artist, count) {
-        var _this11 = this;
+        var _this12 = this;
 
         return new Promise(function (resolve, reject) {
           if (!artist) throw new Error('artist name is required');
-          var url = _this11._buildUrl('getTopSongs', {
+          var url = _this12._buildUrl('getTopSongs', {
             count: count || 50,
             artist: artist
           });
-          _this11._xhr(url).then(function (e) {
+          _this12._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].topSongs.song;
             resolve(res);
           }, reject);
@@ -719,11 +713,11 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getGenres',
       value: function getGenres() {
-        var _this12 = this;
+        var _this13 = this;
 
         return new Promise(function (resolve, reject) {
-          var url = _this12._buildUrl('getGenres');
-          _this12._xhr(url).then(function (e) {
+          var url = _this13._buildUrl('getGenres');
+          _this13._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].genres.genre;
             resolve(res);
           }, reject);
@@ -740,17 +734,17 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getAlbum',
       value: function getAlbum(id) {
-        var _this13 = this;
+        var _this14 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
             throw new Error('id required');
             return;
           }
-          var url = _this13._buildUrl('getAlbum', {
+          var url = _this14._buildUrl('getAlbum', {
             id: id
           });
-          _this13._xhr(url).then(function (e) {
+          _this14._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].album;
             resolve(res);
           }, reject);
@@ -770,7 +764,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getAlbumList',
       value: function getAlbumList(sort, count, offset, folderId) {
-        var _this14 = this;
+        var _this15 = this;
 
         return new Promise(function (resolve, reject) {
           if (sort) {
@@ -780,8 +774,8 @@ window.SubsonicAPI = function () {
               type: sort
             };
             if (folderId) reqObj.musicFolderId = folderId;
-            var url = _this14._buildUrl('getAlbumList', reqObj);
-            _this14._xhr(url).then(function (e) {
+            var url = _this15._buildUrl('getAlbumList', reqObj);
+            _this15._xhr(url).then(function (e) {
               var res = e.target.response['subsonic-response'].albumList.album;
               resolve(res);
             }, reject);
@@ -803,7 +797,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getAlbumList2',
       value: function getAlbumList2(sort, count, offset, folderId) {
-        var _this15 = this;
+        var _this16 = this;
 
         return new Promise(function (resolve, reject) {
           if (sort) {
@@ -813,8 +807,8 @@ window.SubsonicAPI = function () {
               type: sort
             };
             if (folderId) reqObj.musicFolderId = folderId;
-            var url = _this15._buildUrl('getAlbumList2', reqObj);
-            _this15._xhr(url).then(function (e) {
+            var url = _this16._buildUrl('getAlbumList2', reqObj);
+            _this16._xhr(url).then(function (e) {
               var res = e.target.response['subsonic-response'].albumList2.album;
               resolve(res);
             }, reject);
@@ -834,7 +828,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getArtistInfo',
       value: function getArtistInfo(id, count) {
-        var _this16 = this;
+        var _this17 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -843,11 +837,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this16._buildUrl('getArtistInfo', {
+          var url = _this17._buildUrl('getArtistInfo', {
             id: id,
             count: count || 60
           });
-          _this16._xhr(url).then(function (e) {
+          _this17._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].artistInfo;
             resolve(res);
           }, reject);
@@ -864,7 +858,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getArtistInfo2',
       value: function getArtistInfo2(id, count) {
-        var _this17 = this;
+        var _this18 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -873,11 +867,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           };
-          var url = _this17._buildUrl('getArtistInfo2', {
+          var url = _this18._buildUrl('getArtistInfo2', {
             id: id,
             count: count || 60
           });
-          _this17._xhr(url).then(function (e) {
+          _this18._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].artistInfo2;
             resolve(res);
           }, reject);
@@ -895,7 +889,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getSimilarSongs',
       value: function getSimilarSongs(id, count) {
-        var _this18 = this;
+        var _this19 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -904,11 +898,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this18._buildUrl('getSimilarSongs', {
+          var url = _this19._buildUrl('getSimilarSongs', {
             id: id,
             count: count || 60
           });
-          _this18._xhr(url).then(function (e) {
+          _this19._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].similarSongs;
             resolve(res);
           }, reject);
@@ -925,7 +919,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getSimilarSongs2',
       value: function getSimilarSongs2(id, count) {
-        var _this19 = this;
+        var _this20 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -934,11 +928,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this19._buildUrl('getSimilarSongs2', {
+          var url = _this20._buildUrl('getSimilarSongs2', {
             id: id,
             count: count || 60
           });
-          _this19._xhr(url).then(function (e) {
+          _this20._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].similarSongs2;
             resolve(res);
           }, reject);
@@ -954,7 +948,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getSong',
       value: function getSong(id) {
-        var _this20 = this;
+        var _this21 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -963,10 +957,10 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this20._buildUrl('getSong', {
+          var url = _this21._buildUrl('getSong', {
             id: id
           });
-          _this20._xhr(url).then(function (e) {
+          _this21._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'];
             resolve(res);
           }, reject);
@@ -982,10 +976,10 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getStarred',
       value: function getStarred(folderId) {
-        var _this21 = this;
+        var _this22 = this;
 
         return new Promise(function (resolve, reject) {
-          var url = _this21._buildUrl('getStarred', function () {
+          var url = _this22._buildUrl('getStarred', function () {
             if (folderId) {
               return {
                 musicFolderId: folderId
@@ -994,7 +988,7 @@ window.SubsonicAPI = function () {
               return;
             }
           }());
-          _this21._xhr(url).then(function (e) {
+          _this22._xhr(url).then(function (e) {
             var res = e.target.resolve['subsonic-response'].starred;
             resolve(res);
           }, reject);
@@ -1010,10 +1004,10 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getStarred2',
       value: function getStarred2(folderId) {
-        var _this22 = this;
+        var _this23 = this;
 
         return new Promise(function (resolve, reject) {
-          var url = _this22._buildUrl('getStarred2', function () {
+          var url = _this23._buildUrl('getStarred2', function () {
             if (folderId) {
               return {
                 musicFolderId: folderId
@@ -1022,7 +1016,7 @@ window.SubsonicAPI = function () {
               return;
             }
           }());
-          _this22._xhr(url).then(function (e) {
+          _this23._xhr(url).then(function (e) {
             var res = e.target.resolve['subsonic-response'].starred2;
             resolve(res);
           }, reject);
@@ -1039,7 +1033,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'getCoverArt',
       value: function getCoverArt(id, size) {
-        var _this23 = this;
+        var _this24 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -1048,11 +1042,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this23._buildUrl('getCoverArt', {
+          var url = _this24._buildUrl('getCoverArt', {
             id: id,
             size: size || 500
           });
-          _this23._xhr(url, 'blob').then(function (e) {
+          _this24._xhr(url, 'blob').then(function (e) {
             var blob = e.target.response;
             resolve(blob);
           }, reject);
@@ -1068,7 +1062,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'star',
       value: function star(id) {
-        var _this24 = this;
+        var _this25 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -1077,10 +1071,10 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this24._buildUrl('star', {
+          var url = _this25._buildUrl('star', {
             id: id
           });
-          _this24._xhr(url).then(function (e) {
+          _this25._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'];
             resolve(res);
           }, reject);
@@ -1096,7 +1090,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'unstar',
       value: function unstar(id) {
-        var _this25 = this;
+        var _this26 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -1105,10 +1099,10 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this25._buildUrl('unstar', {
+          var url = _this26._buildUrl('unstar', {
             id: id
           });
-          _this25._xhr(url).then(function (e) {
+          _this26._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'];
             resolve(res);
           }, reject);
@@ -1125,7 +1119,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'setRating',
       value: function setRating(id, rating) {
-        var _this26 = this;
+        var _this27 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -1134,11 +1128,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this26._buildUrl('setRating', {
+          var url = _this27._buildUrl('setRating', {
             id: id,
             rating: rating
           });
-          _this26._xhr(url).then(function (e) {
+          _this27._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'];
             resolve(res);
           }, reject);
@@ -1155,7 +1149,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'scrobble',
       value: function scrobble(id) {
-        var _this27 = this;
+        var _this28 = this;
 
         return new Promise(function (resolve, reject) {
           if (!id) {
@@ -1164,11 +1158,11 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this27._buildUrl('scrobble', {
+          var url = _this28._buildUrl('scrobble', {
             id: id,
             time: new Date().getTime()
           });
-          _this27._xhr(url).then(function (e) {
+          _this28._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'];
             resolve(res);
           }, reject);
@@ -1184,7 +1178,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'search',
       value: function search(obj) {
-        var _this28 = this;
+        var _this29 = this;
 
         return new Promise(function (resolve, reject) {
           if (!obj) {
@@ -1192,8 +1186,8 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this28._buildUrl('search', obj);
-          _this28._xhr(url).then(function (e) {
+          var url = _this29._buildUrl('search', obj);
+          _this29._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].searchResult.match;
             resolve(res);
           }, reject);
@@ -1209,7 +1203,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'search2',
       value: function search2(obj) {
-        var _this29 = this;
+        var _this30 = this;
 
         return new Promise(function (resolve, reject) {
           if (!obj) {
@@ -1217,8 +1211,8 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this29._buildUrl('search2', obj);
-          _this29._xhr(url).then(function (e) {
+          var url = _this30._buildUrl('search2', obj);
+          _this30._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].search2Result.match;
             resolve(res);
           }, reject);
@@ -1234,7 +1228,7 @@ window.SubsonicAPI = function () {
     }, {
       key: 'search3',
       value: function search3(obj) {
-        var _this30 = this;
+        var _this31 = this;
 
         return new Promise(function (resolve, reject) {
           if (!obj) {
@@ -1242,8 +1236,8 @@ window.SubsonicAPI = function () {
             reject(err);
             return;
           }
-          var url = _this30._buildUrl('search3', obj);
-          _this30._xhr(url).then(function (e) {
+          var url = _this31._buildUrl('search3', obj);
+          _this31._xhr(url).then(function (e) {
             var res = e.target.response['subsonic-response'].search3Result.match;
             resolve(res);
           }, reject);
